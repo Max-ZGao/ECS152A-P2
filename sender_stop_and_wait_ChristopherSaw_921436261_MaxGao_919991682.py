@@ -19,13 +19,7 @@ MESSAGE_SIZE = PACKET_SIZE - SEQ_ID_SIZE
 class Packet:
     seq_id: int
 
-# start measuring send time
-send_time = time.time()
 
-# create socket
-client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #create a socket with IPV4(AF_INET) and UDP (SOCK_DGRAM)
-# set timeout
-client.settimeout(TIMEOUT)
 
 dest = (DEST_ADDR, DEST_PORT)
 
@@ -37,6 +31,14 @@ with open('file.mp3', 'rb') as f: # read in mp3
 
         nPacket = struct.pack("I", (i)) + f.read(MESSAGE_SIZE)
         packets_to_send.append(nPacket)
+
+# start measuring send time
+send_time = time.time()
+
+# create socket
+client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #create a socket with IPV4(AF_INET) and UDP (SOCK_DGRAM)
+# set timeout
+client.settimeout(TIMEOUT)
 
 # send payload in chunks
 totalPacketDelay = 0
@@ -73,9 +75,9 @@ throughput = rtt / os.path.getsize("file.mp3")
 perPackDelay = totalPacketDelay / numpacketsNeed
 metric = 0.3 * (throughput / 1000) + (0.7 / perPackDelay)
 
-print(f'Throughput: {throughput}')
-print(f'Per packet delay: {perPackDelay}')
-print(f'Metric: {metric}')
+print(f'Throughput: {throughput:7f},')
+print(f'Average packet delay: {perPackDelay:7f},')
+print(f'Metric: {metric:7f}')
 client.close()
 
 
