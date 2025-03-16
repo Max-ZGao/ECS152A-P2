@@ -1,0 +1,65 @@
+
+import socket
+import sys
+import time
+import json
+
+# constants
+PORT_NUM = 8081
+DEST_ADDR = "127.0.0.1"
+DEST_PORT = 8080
+TIMEOUT = 30  # in sec
+
+# To Do: read in mp3 
+
+# start measuring send time
+send_time = time.time()
+
+# create socket
+client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #create a socket with IPV4(AF_INET) and UDP (SOCK_DGRAM)
+# set timeout
+client.settimeout(TIMEOUT)
+
+dest = (DEST_ADDR, DEST_PORT)
+print(("payload size",sys.getsizeof(payload)))
+# header packet
+header = {
+    "timestamp": time.time(),
+    "size_in_kb": (payload_size_mb * 1024)
+}
+
+# i think we can use json to encode the header for now
+header_packet = json.dumps(header).encode()
+# send header packet
+header_sent = False
+while not header_sent:
+    try:
+        client.sendto(header_packet, dest)
+        print("Header packet sent:", header)
+
+        # acknowledgment from the server
+        ack, _ = client.recvfrom(1024)
+        if ack.decode() == "Header Recieved":
+            print("Header packet acknowledged by server.")
+            header_sent = True
+    except socket.timeout:
+        print("Header packet lost, restarting...")
+        continue
+
+# send payload in chunks
+chunk_size = 1024
+for i in range(0, len(payload), chunk_size):
+    chunk = payload[i:i + chunk_size] 
+    client.sendto(chunk, dest)
+    
+
+# receive server response
+try:
+    response, server_address = client.recvfrom(1024)
+    throughput = response.decode()
+    print(f"Server response received from {server_address}:")
+    print(f"Throughput: {throughput} KB/s")
+except socket.timeout:
+    print("Server response timed out. Data may have been lost.")
+
+client.close()
