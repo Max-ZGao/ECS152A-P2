@@ -1,4 +1,5 @@
 
+import dataclasses
 import socket
 import struct
 import sys
@@ -10,9 +11,14 @@ PORT_NUM = 8081
 DEST_ADDR = "0.0.0.0"
 DEST_PORT = 5001
 TIMEOUT = 5  # in sec
+PACKET_SIZE = 1024
+SEQ_ID_SIZE = 4
+MESSAGE_SIZE = PACKET_SIZE - SEQ_ID_SIZE
 
-
-
+@dataclasses.dataclass
+class Packet:
+    seq_id: int
+    message: int
 
 # start measuring send time
 send_time = time.time()
@@ -25,18 +31,16 @@ client.settimeout(TIMEOUT)
 dest = (DEST_ADDR, DEST_PORT)
 
 # Generate packets
+packets_to_send = []
+with open('file.mp3', 'rb') as f: # read in mp3 
+    numpacketsNeed = f.__sizeof__() / 1020
+    for i in numBytes:
+        nPacket = Packet(i, f.read(MESSAGE_SIZE))
+        packets_to_send.append(nPacket)
 
-with open('/hdd/file2.mp3', 'wb') as f: # read in mp3 
-    for i in 100:
-        headerSeq = struct.pack("I", i)
+print(packets_to_send)
 
-header = {
-    "timestamp": time.time(),
-    "size_in_kb": (payload_size_mb * 1024)
-}
-
-# i think we can use json to encode the header for now
-header_packet = json.dumps(header).encode()
+"""
 # send header packet
 header_sent = False
 while not header_sent:
@@ -69,4 +73,5 @@ try:
 except socket.timeout:
     print("Server response timed out. Data may have been lost.")
 
-client.close()
+client.close()"
+"""
