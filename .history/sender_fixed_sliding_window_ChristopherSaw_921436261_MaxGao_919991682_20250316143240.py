@@ -71,8 +71,8 @@ while base < numpacketsNeed:
             if base == numpacketsNeed:
                 #print("done")
                 recv_time = time.time()
-                termination = struct.pack("i", -1)
-                client.sendto(termination, dest)
+                termination_packet = struct.pack("i", -1)
+                client.sendto(termination_packet, dest)
 
     except socket.timeout:
         print("Timeout")
