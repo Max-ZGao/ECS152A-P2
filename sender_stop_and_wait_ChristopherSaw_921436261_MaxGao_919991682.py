@@ -1,16 +1,18 @@
 
 import socket
+import struct
 import sys
 import time
 import json
 
 # constants
 PORT_NUM = 8081
-DEST_ADDR = "127.0.0.1"
-DEST_PORT = 8080
-TIMEOUT = 30  # in sec
+DEST_ADDR = "0.0.0.0"
+DEST_PORT = 5001
+TIMEOUT = 5  # in sec
 
-# To Do: read in mp3 
+
+
 
 # start measuring send time
 send_time = time.time()
@@ -21,8 +23,13 @@ client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #create a socket with 
 client.settimeout(TIMEOUT)
 
 dest = (DEST_ADDR, DEST_PORT)
-print(("payload size",sys.getsizeof(payload)))
-# header packet
+
+# Generate packets
+
+with open('/hdd/file2.mp3', 'wb') as f: # read in mp3 
+    for i in 100:
+        headerSeq = struct.pack("I", i)
+
 header = {
     "timestamp": time.time(),
     "size_in_kb": (payload_size_mb * 1024)
