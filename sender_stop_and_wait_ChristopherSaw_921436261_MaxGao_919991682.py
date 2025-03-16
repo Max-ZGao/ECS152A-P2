@@ -34,8 +34,7 @@ packets_to_send = []
 with open('file.mp3', 'rb') as f: # read in mp3 
     numpacketsNeed = os.path.getsize("file.mp3") // MESSAGE_SIZE
     for i in range(numpacketsNeed):
-        if(i == 5215):
-            print(i)
+
         nPacket = struct.pack("I", (i)) + f.read(MESSAGE_SIZE)
         packets_to_send.append(nPacket)
 
@@ -43,21 +42,23 @@ with open('file.mp3', 'rb') as f: # read in mp3
 totalPacketDelay = 0
 chunk_size = 1024
 counter = 0
+
 for packet in packets_to_send:
     ackEd = False
     per_packet_send = time.time()
     while(ackEd == False):
-        client.sendto(packet, dest)
-        # receive server response
+
         try:
-            print(f"trying to recieve {counter}")
+            client.sendto(packet, dest)
+            # receive server response
+            # print(f"trying to recieve {counter}")
             ack, _ = client.recvfrom(PACKET_SIZE)
             seq_id = ack[:SEQ_ID_SIZE] 
             id = int.from_bytes(seq_id, signed=True, byteorder='big')
             if(id == counter):
                 ackEd = True
                 counter += 1
-                if(id == numpacketsNeed): # last ack recieved mark down recv time
+                if(id == numpacketsNeed - 1): # last ack recieved mark down recv time
                     recv_time = time.time()
         except socket.timeout:
             print("Server response timed out. Resending")
@@ -74,7 +75,7 @@ metric = 0.3 * (throughput / 1000) + (0.7 / perPackDelay)
 
 print(f'Throughput: {throughput}')
 print(f'Per packet delay: {perPackDelay}')
-
+print(f'Metric: {metric}')
 client.close()
 
 
