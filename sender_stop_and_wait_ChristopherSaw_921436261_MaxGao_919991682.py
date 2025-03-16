@@ -4,7 +4,7 @@ import socket
 import struct
 import sys
 import time
-import json
+import os
 
 # constants
 PORT_NUM = 8081
@@ -33,13 +33,21 @@ dest = (DEST_ADDR, DEST_PORT)
 # Generate packets
 packets_to_send = []
 with open('file.mp3', 'rb') as f: # read in mp3 
-    numpacketsNeed = f.__sizeof__() / 1020
-    for i in numBytes:
+    numpacketsNeed = os.path.getsize("file.mp3") // MESSAGE_SIZE
+    print(numpacketsNeed)
+    print(os.path.getsize("file.mp3"))
+    for i in range(numpacketsNeed):
         nPacket = Packet(i, f.read(MESSAGE_SIZE))
         packets_to_send.append(nPacket)
 
-print(packets_to_send)
+print(packets_to_send.__sizeof__())
 
+with open('file2.mp3', 'wb') as f:
+    for i in range(numpacketsNeed):
+        print(f'writing {packets_to_send[i].seq_id}')
+        if(i == 0):
+            print(packets_to_send[i].message)
+        f.write(packets_to_send[i].message)
 """
 # send header packet
 header_sent = False
