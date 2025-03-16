@@ -7,7 +7,7 @@ from collections import deque
 PORT_NUM = 8081
 DEST_ADDR = "127.0.0.1"
 DEST_PORT = 5001
-TIMEOUT = 1
+TIMEOUT = 1 
 PACKET_SIZE = 1024
 SEQ_ID_SIZE = 4
 MESSAGE_SIZE = PACKET_SIZE - SEQ_ID_SIZE
@@ -15,24 +15,24 @@ WINDOW_SIZE = 100
 
 client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
 client.settimeout(TIMEOUT)
+
 dest = (DEST_ADDR, DEST_PORT)
 
+# Generate packets
 packets_to_send = []
-with open('file.mp3', 'rb') as f:  
+with open('file.mp3', 'rb') as f:  # Read the file
     numpacketsNeed = (os.path.getsize("file.mp3") + MESSAGE_SIZE - 1) // MESSAGE_SIZE
     for i in range(numpacketsNeed):
-        nPacket = struct.pack("I", i) + f.read(MESSAGE_SIZE) 
+        nPacket = struct.pack("I", i) + f.read(MESSAGE_SIZE)  # Pack sequence ID and data
         packets_to_send.append(nPacket)
 
-
-base = 0 
- # counter for next number to send
-next_seq_num = 0 
-window = [] 
-# ack received for each packet
-acks_received = [False] * numpacketsNeed
-totalPacketDelay = 0
-recv_time = None 
+# Sliding window variables
+base = 0  # Base of the window
+next_seq_num = 0  # Next sequence number to send
+window = deque()  # Queue to track packets in the window
+acks_received = [False] * numpacketsNeed  # Track acknowledgments
+totalPacketDelay = 0  # Total delay for all packets
+recv_time = None  # Time when the last acknowledgment is received
 
 # Function to send packets in the window
 def send_packets_in_window():
@@ -50,14 +50,14 @@ while base < numpacketsNeed:
     send_packets_in_window()
 
     try:   
-        #print("Getting ACK")
+        #print("ack~")
         ack, _ = client.recvfrom(PACKET_SIZE)
         seq_id = ack[:SEQ_ID_SIZE]
         ack_id = int.from_bytes(seq_id, signed=True, byteorder='big')
 
         if base <= ack_id < base + WINDOW_SIZE:
             acks_received[ack_id] = True
-            print(f"Received ACK {ack_id}")
+            # Calculate per-packet delay
             for i in range(len(window)):
                 if window[i][0] == ack_id:
                     send_time_packet = window[i][1]
@@ -66,14 +66,16 @@ while base < numpacketsNeed:
                     break
 
             while base < numpacketsNeed and acks_received[base]:
+                # move the window forward
                 base += 1
 
             if base == numpacketsNeed:
-                #print("done")
+                #stop the timer
                 recv_time = time.time()
 
     except socket.timeout:
-        print("Timeout")
+        # Resend all packets in the window
+        print("Timeout occurred. Resending packets in the window.")
         next_seq_num = base
         window.clear()
 

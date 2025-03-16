@@ -8,7 +8,7 @@ import os
 
 # constants
 PORT_NUM = 8081
-DEST_ADDR = "127.0.0.1"
+DEST_ADDR = "0.0.0.0"
 DEST_PORT = 5001
 TIMEOUT = 1  # in sec
 PACKET_SIZE = 1024

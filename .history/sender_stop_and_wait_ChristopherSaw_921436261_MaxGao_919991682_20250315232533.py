@@ -29,7 +29,7 @@ with open('file.mp3', 'rb') as f: # read in mp3
     numpacketsNeed = os.path.getsize("file.mp3") // MESSAGE_SIZE
     for i in range(numpacketsNeed):
 
-        nPacket = struct.pack("!I", i) + f.read(MESSAGE_SIZE)
+        nPacket = struct.pack("I", (i)) + f.read(MESSAGE_SIZE)
         packets_to_send.append(nPacket)
 
 # start measuring send time

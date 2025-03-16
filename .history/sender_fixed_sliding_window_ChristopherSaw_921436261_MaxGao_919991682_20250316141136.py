@@ -7,7 +7,7 @@ from collections import deque
 PORT_NUM = 8081
 DEST_ADDR = "127.0.0.1"
 DEST_PORT = 5001
-TIMEOUT = 1
+TIMEOUT = 1 
 PACKET_SIZE = 1024
 SEQ_ID_SIZE = 4
 MESSAGE_SIZE = PACKET_SIZE - SEQ_ID_SIZE
@@ -29,10 +29,9 @@ base = 0
  # counter for next number to send
 next_seq_num = 0 
 window = [] 
-# ack received for each packet
-acks_received = [False] * numpacketsNeed
-totalPacketDelay = 0
-recv_time = None 
+acks_received = [False] * numpacketsNeed  # Track acknowledgments
+totalPacketDelay = 0  # Total delay for all packets
+recv_time = None  # Time when the last acknowledgment is received
 
 # Function to send packets in the window
 def send_packets_in_window():
