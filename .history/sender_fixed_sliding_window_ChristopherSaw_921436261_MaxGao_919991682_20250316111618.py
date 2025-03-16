@@ -46,6 +46,7 @@ def send_packets_in_window():
 
 
 while base < numpacketsNeed:
+    
     send_packets_in_window()
     try:
         # TODO:  sliding window logic
@@ -60,15 +61,9 @@ send_time = None
 totalPacketDelay = None
 
 rtt = recv_time - send_time
-print(f"RTT: {rtt}")
 throughput = os.path.getsize("file.mp3") / rtt 
-print(f"Throughput: {throughput}")
 perPackDelay = totalPacketDelay / numpacketsNeed 
-print(f"Per packet delay: {perPackDelay}")
 metric = 0.3 * (throughput / 1000) + (0.7 / perPackDelay)  
-print(f"Metric: {metric}")
-
-
 
 
 

@@ -66,7 +66,7 @@ print(f"Throughput: {throughput}")
 perPackDelay = totalPacketDelay / numpacketsNeed 
 print(f"Per packet delay: {perPackDelay}")
 metric = 0.3 * (throughput / 1000) + (0.7 / perPackDelay)  
-print(f"Metric: {metric}")
+
 
 
 
