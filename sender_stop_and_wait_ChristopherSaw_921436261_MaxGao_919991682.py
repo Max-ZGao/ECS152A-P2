@@ -36,19 +36,9 @@ with open('file.mp3', 'rb') as f: # read in mp3
     print(numpacketsNeed)
     print(os.path.getsize("file.mp3"))
     for i in range(numpacketsNeed):
-        seq_id = Packet(i)
-        nPacket = struct.pack("I", *(Packet.astuple(seq_id))) + f.read(MESSAGE_SIZE)
+        nPacket = struct.pack("I", (i)) + f.read(MESSAGE_SIZE)
         packets_to_send.append(nPacket)
 
-def create_acknowledgement(seq_id, message):
-    return int.to_bytes(seq_id, SEQ_ID_SIZE, signed=True, byteorder='big') + message.encode()
-
-
-acknowledgement = create_acknowledgement(packets_to_send, 'ack')
-
-print(acknowledgement.decode())
-
-"""
 # send payload in chunks
 totalPacketDelay = 0
 chunk_size = 1024
@@ -61,7 +51,9 @@ for packet in packets_to_send:
         try:
             response = client.recvfrom(1024)
             throughput = response.decode()
-            
+            seq_id = acknowledgement[:SEQ_ID_SIZE] 
+print(int.from_bytes(seq_id, signed=True, byteorder='big'))
+
             if()
             ackEd = True
         except socket.timeout:
@@ -71,7 +63,7 @@ for packet in packets_to_send:
     totalPacketDelay += per_packet_rtt
 
 client.close()
-"""
+
 
 
 
